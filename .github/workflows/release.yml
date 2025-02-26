@@ -31,7 +31,12 @@ jobs:
 
       - name: Build and Publish
         run: |
-          dotnet publish DisplayRotator.sln --configuration Release --runtime win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishReadyToRun=true --output publish -v minimal
+          dotnet publish ./src/DisplayRotator.csproj --configuration Release --runtime win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishReadyToRun=true --output publish -v minimal
+
+      - name: Verify Publish Directory
+        run: |
+          echo "Listing contents of publish directory:"
+          ls -R publish
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
@@ -46,13 +51,15 @@ jobs:
           filename: "DisplayRotator-${{ github.ref_name }}.zip"
           directory: "publish"
 
-      - name: List files for debugging
+      - name: Verify Zip File path
         run: ls -R
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: "DisplayRotator-${{ github.ref_name }}.zip"
+          files: "**/DisplayRotator-${{ github.ref_name }}.zip"
           draft: false
           prerelease: false
           generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
