@@ -153,7 +153,10 @@ namespace DisplayRotator
                         Keys key = shortcut.Value & Keys.KeyCode;
                         if (!RegisterHotKey(this.Handle, i, modifiers, (int)key))
                         {
-                            MessageBox.Show($"ホットキーの登録に失敗しました: {shortcut.Value}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show(resourceManager.GetString("HotKeyRegistrationFailed", CultureInfo.CurrentCulture) + $": {shortcut.Value}",
+                                            resourceManager.GetString("Error", CultureInfo.CurrentCulture),
+                                            MessageBoxButtons.OK,
+                                            MessageBoxIcon.Error);
                         }
                     }
                 }
