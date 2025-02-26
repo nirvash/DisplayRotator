@@ -31,7 +31,7 @@ jobs:
           dotnet publish DisplayRotator.sln --configuration Release --runtime win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishReadyToRun=true --output publish -v minimal
 
       - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: DisplayRotator-Build
           path: publish/**
