@@ -4,29 +4,35 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
   release:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 9.0.x
-    - name: Publish
-      run: dotnet publish --configuration Release --runtime win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishReadyToRun=true -o publish
-    - name: Zip Release
-      uses: thedoctor0/zip-release@0.7.1
-      with:
-        type: 'zip'
-        filename: 'DisplayRotator-${{ github.ref_name }}.zip'
-        directory: 'publish'
-    - name: Create Release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: 'publish/DisplayRotator-${{ github.ref_name }}.zip'
-        draft: false
-        prerelease: false
-        generate_release_notes: true
+      - uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Build and Publish
+        run: |
+          dotnet restore [DisplayRotator.sln](http://_vscodecontentref_/0)
+          dotnet publish [DisplayRotator.sln](http://_vscodecontentref_/1) --configuration Release --runtime win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishReadyToRun=true --output publish
+
+      - name: Zip Release
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: "zip"
+          filename: "DisplayRotator-${{ github.ref_name }}.zip"
+          directory: "publish"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: "publish/DisplayRotator-${{ github.ref_name }}.zip"
+          draft: false
+          prerelease: false
+          generate_release_notes: true
