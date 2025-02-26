@@ -9,15 +9,43 @@
     <UseWPF>false</UseWPF>
     <Version>1.0.4</Version>
     <ApplicationIcon>../assets/display.ico</ApplicationIcon>
+    <RootNamespace>DisplayRotator</RootNamespace>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.3" />
+    <PackageReference Include="System.Resources.Extensions" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="..\assets\display.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>DisplayRotator.Properties</CustomToolNamespace>
+    </EmbeddedResource>
+    <!-- 日本語リソース -->
+    <EmbeddedResource Include="Properties\Resources.ja.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <LastGenOutput>Resources.ja.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>DisplayRotator.Properties</CustomToolNamespace>
+    </EmbeddedResource>
+    <!-- 他の言語を追加する場合はここに追加 -->
   </ItemGroup>
 </Project>

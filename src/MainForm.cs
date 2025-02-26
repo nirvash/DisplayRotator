@@ -1,5 +1,7 @@
 using System.Runtime.InteropServices;
 using static DisplayRotator.Win32Api;
+using System.Resources;
+using System.Globalization;
 
 namespace DisplayRotator
 {
@@ -27,10 +29,12 @@ namespace DisplayRotator
         private NotifyIcon? notifyIcon;
         private ContextMenuStrip? contextMenu;
         private SettingsManager _settingsManager = new();
+        private ResourceManager resourceManager;
 
         public MainForm()
         {
             InitializeComponent();
+            resourceManager = new ResourceManager("DisplayRotator.Properties.Resources", typeof(MainForm).Assembly);
             UpdateMenuItems();  // メニュー項目を初期化
             this.Hide();  // フォームを非表示に
             RegisterHotKeys();  // ホットキーを登録
@@ -97,10 +101,10 @@ namespace DisplayRotator
             contextMenu?.Items.Clear();
 
             var rotations = new[] {
-                (name: "標準 (0°)", id: RotationConstants.DMDO_DEFAULT),
-                (name: "90°回転", id: RotationConstants.DMDO_90),
-                (name: "180°回転", id: RotationConstants.DMDO_180),
-                (name: "270°回転", id: RotationConstants.DMDO_270)
+                (name: resourceManager.GetString("DefaultRotation", CultureInfo.CurrentCulture), id: RotationConstants.DMDO_DEFAULT),
+                (name: resourceManager.GetString("Rotate90", CultureInfo.CurrentCulture), id: RotationConstants.DMDO_90),
+                (name: resourceManager.GetString("Rotate180", CultureInfo.CurrentCulture), id: RotationConstants.DMDO_180),
+                (name: resourceManager.GetString("Rotate270", CultureInfo.CurrentCulture), id: RotationConstants.DMDO_270)
             };
 
             foreach (var rotation in rotations)
@@ -118,9 +122,9 @@ namespace DisplayRotator
             }
 
             contextMenu?.Items.Add("-");
-            contextMenu?.Items.Add("ショートカット設定", null, (s, e) => ShowShortcutSettings());
+            contextMenu?.Items.Add(resourceManager.GetString("ShortcutSettings", CultureInfo.CurrentCulture), null, (s, e) => ShowShortcutSettings());
             contextMenu?.Items.Add("-");
-            contextMenu?.Items.Add("終了", null, (s, e) => Application.Exit());
+            contextMenu?.Items.Add(resourceManager.GetString("Exit", CultureInfo.CurrentCulture), null, (s, e) => Application.Exit());
         }
 
         private void RegisterHotKeys()
