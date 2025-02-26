@@ -16,7 +16,7 @@ DisplayRotator is a tool for easily managing display rotation. You can set short
 1. Clone the repository.
 
    ```bash
-   git clone https://github.com/yourusername/DisplayRotator.git
+   git clone https://github.com/nirvash/DisplayRotator.git
    ```
 
 2. Build the project.

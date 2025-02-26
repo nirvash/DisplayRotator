@@ -16,7 +16,7 @@ DisplayRotator は、ディスプレイの回転を簡単に管理するため�
 1. リポジトリをクローンします。
 
    ```bash
-   git clone https://github.com/yourusername/DisplayRotator.git
+   git clone https://github.com/nirvash/DisplayRotator.git
    ```
 
 2. プロジェクトをビルドします。
