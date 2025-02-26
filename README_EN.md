@@ -4,7 +4,7 @@
 
 DisplayRotator is a tool for easily managing display rotation. You can set shortcut keys to quickly switch display rotation.
 
-![Screenshot](assets/screenshot.png)
+<img src="assets/screenshot.png" alt="Screenshot" width="400"/>
 
 ## Features
 
