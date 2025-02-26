@@ -1,3 +1,6 @@
+using System.Resources;
+using System.Globalization;
+
 namespace DisplayRotator
 {
     partial class ShortcutForm
@@ -11,6 +14,7 @@ namespace DisplayRotator
         private Label lblShortcut;
         private Button btnSave;
         private FlowLayoutPanel modifierPanel;
+        private ResourceManager resourceManager;
 
         protected override void Dispose(bool disposing)
         {
@@ -24,6 +28,7 @@ namespace DisplayRotator
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            resourceManager = new ResourceManager("DisplayRotator.Properties.Resources", typeof(ShortcutForm).Assembly);
 
             // Initialize controls
             btnCtrl = new Button();
@@ -36,7 +41,7 @@ namespace DisplayRotator
             modifierPanel = new FlowLayoutPanel();
 
             // Form settings
-            this.Text = "ショートカット設定";
+            this.Text = resourceManager.GetString("ShortcutSettings", CultureInfo.CurrentCulture);
             this.Size = new System.Drawing.Size(400, 200);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -51,10 +56,10 @@ namespace DisplayRotator
 
             // Setup modifier buttons
             var modifiers = new[] {
-                (btn: btnCtrl, text: "Ctrl"),
-                (btn: btnAlt, text: "Alt"),
-                (btn: btnShift, text: "Shift"),
-                (btn: btnWin, text: "Win")
+                (btn: btnCtrl, text: resourceManager.GetString("Ctrl", CultureInfo.CurrentCulture)),
+                (btn: btnAlt, text: resourceManager.GetString("Alt", CultureInfo.CurrentCulture)),
+                (btn: btnShift, text: resourceManager.GetString("Shift", CultureInfo.CurrentCulture)),
+                (btn: btnWin, text: resourceManager.GetString("Win", CultureInfo.CurrentCulture))
             };
 
             foreach (var (btn, text) in modifiers)
@@ -69,14 +74,14 @@ namespace DisplayRotator
             txtKey.Location = new System.Drawing.Point(12, 55);
             txtKey.Size = new System.Drawing.Size(370, 23);
             txtKey.ReadOnly = true;
-            txtKey.Text = "キーを押してください";
+            txtKey.Text = resourceManager.GetString("PressKey", CultureInfo.CurrentCulture);
 
             // Shortcut label setup
             lblShortcut.AutoSize = true;
             lblShortcut.Location = new System.Drawing.Point(12, 90);
 
             // Save button setup
-            btnSave.Text = "保存";
+            btnSave.Text = resourceManager.GetString("Save", CultureInfo.CurrentCulture);
             btnSave.Location = new System.Drawing.Point(302, 120);
             btnSave.Size = new System.Drawing.Size(80, 30);
 

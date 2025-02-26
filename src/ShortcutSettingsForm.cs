@@ -1,5 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
+using System.Resources;
+using System.Globalization;
 
 namespace DisplayRotator
 {
@@ -8,11 +12,13 @@ namespace DisplayRotator
         private readonly SettingsManager _settingsManager;
         private readonly TableLayoutPanel _layout;
         private readonly Dictionary<int, (Label label, Button clearButton, CheckBox displayCheckBox)> _controls = new();
+        private readonly ResourceManager resourceManager;
 
         public ShortcutSettingsForm(SettingsManager settingsManager)
         {
             _settingsManager = settingsManager;
             _layout = new TableLayoutPanel();
+            resourceManager = new ResourceManager("DisplayRotator.Properties.Resources", typeof(ShortcutSettingsForm).Assembly);
             InitializeComponents();
             LoadDisplaySettings();
 
@@ -39,7 +45,7 @@ namespace DisplayRotator
 
         private void InitializeComponents()
         {
-            Text = "ショートカットキー設定";
+            Text = resourceManager.GetString("ShortcutSettings", CultureInfo.CurrentCulture);
             MinimumSize = new System.Drawing.Size(400, 250);
             Size = MinimumSize;
             FormBorderStyle = FormBorderStyle.Sizable;  // リサイズ可能に変更
@@ -64,17 +70,17 @@ namespace DisplayRotator
             }
 
             // ヘッダー行
-            _layout.Controls.Add(new Label { Text = "表示", TextAlign = ContentAlignment.MiddleLeft }, 0, 0);
-            _layout.Controls.Add(new Label { Text = "回転方向", TextAlign = ContentAlignment.MiddleLeft }, 1, 0);
-            _layout.Controls.Add(new Label { Text = "ショートカット", TextAlign = ContentAlignment.MiddleLeft }, 2, 0);
-            _layout.Controls.Add(new Label { Text = "操作", TextAlign = ContentAlignment.MiddleLeft }, 3, 0);
+            _layout.Controls.Add(new Label { Text = resourceManager.GetString("Display", CultureInfo.CurrentCulture), TextAlign = ContentAlignment.MiddleLeft }, 0, 0);
+            _layout.Controls.Add(new Label { Text = resourceManager.GetString("RotationDirection", CultureInfo.CurrentCulture), TextAlign = ContentAlignment.MiddleLeft }, 1, 0);
+            _layout.Controls.Add(new Label { Text = resourceManager.GetString("Shortcut", CultureInfo.CurrentCulture), TextAlign = ContentAlignment.MiddleLeft }, 2, 0);
+            _layout.Controls.Add(new Label { Text = resourceManager.GetString("Operation", CultureInfo.CurrentCulture), TextAlign = ContentAlignment.MiddleLeft }, 3, 0);
 
             var rotations = new[]
             {
-                (name: "標準 (0°)", id: RotationConstants.DMDO_DEFAULT),
-                (name: "90°回転", id: RotationConstants.DMDO_90),
-                (name: "180°回転", id: RotationConstants.DMDO_180),
-                (name: "270°回転", id: RotationConstants.DMDO_270)
+                (name: resourceManager.GetString("DefaultRotation", CultureInfo.CurrentCulture), id: RotationConstants.DMDO_DEFAULT),
+                (name: resourceManager.GetString("Rotate90", CultureInfo.CurrentCulture), id: RotationConstants.DMDO_90),
+                (name: resourceManager.GetString("Rotate180", CultureInfo.CurrentCulture), id: RotationConstants.DMDO_180),
+                (name: resourceManager.GetString("Rotate270", CultureInfo.CurrentCulture), id: RotationConstants.DMDO_270)
             };
 
             for (int i = 0; i < rotations.Length; i++)
@@ -118,7 +124,7 @@ namespace DisplayRotator
 
                 var setButton = new Button
                 {
-                    Text = "設定",
+                    Text = resourceManager.GetString("Set", CultureInfo.CurrentCulture),
                     AutoSize = true,
                     Margin = new Padding(0, 0, 4, 0),
                     Height = 23,
@@ -127,7 +133,7 @@ namespace DisplayRotator
 
                 var clearButton = new Button
                 {
-                    Text = "削除",
+                    Text = resourceManager.GetString("Clear", CultureInfo.CurrentCulture),
                     AutoSize = true,
                     Height = 23,
                     Width = 60,  // ボタン幅を固定
@@ -157,7 +163,7 @@ namespace DisplayRotator
                 Padding = new Padding(8)
             };
 
-            var closeButton = new Button { Text = "閉じる", DialogResult = DialogResult.OK };
+            var closeButton = new Button { Text = resourceManager.GetString("Close", CultureInfo.CurrentCulture), DialogResult = DialogResult.OK };
             bottomPanel.Controls.Add(closeButton);
 
             Controls.Add(_layout);
@@ -213,7 +219,7 @@ namespace DisplayRotator
             _settingsManager.RemoveShortcut(rotationId);
             if (_controls.TryGetValue(rotationId, out var controls))
             {
-                controls.label.Text = "未設定";
+                controls.label.Text = resourceManager.GetString("NotSet", CultureInfo.CurrentCulture);
                 controls.clearButton.Enabled = false;
             }
         }

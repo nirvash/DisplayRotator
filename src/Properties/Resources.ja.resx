@@ -48,4 +48,55 @@
   <data name="Exit" xml:space="preserve">
     <value>終了</value>
   </data>
+  <data name="Display" xml:space="preserve">
+    <value>表示</value>
+  </data>
+  <data name="RotationDirection" xml:space="preserve">
+    <value>回転方向</value>
+  </data>
+  <data name="Shortcut" xml:space="preserve">
+    <value>ショートカット</value>
+  </data>
+  <data name="Operation" xml:space="preserve">
+    <value>操作</value>
+  </data>
+  <data name="Set" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="Clear" xml:space="preserve">
+    <value>削除</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>閉じる</value>
+  </data>
+  <data name="NotSet" xml:space="preserve">
+    <value>未設定</value>
+  </data>
+  <data name="HotKeyRegistrationFailed" xml:space="preserve">
+    <value>ホットキーの登録に失敗しました</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>エラー</value>
+  </data>
+  <data name="DisplayNotFound" xml:space="preserve">
+    <value>対象のディスプレイが見つかりませんでした</value>
+  </data>
+  <data name="Ctrl" xml:space="preserve">
+    <value>Ctrl</value>
+  </data>
+  <data name="Alt" xml:space="preserve">
+    <value>Alt</value>
+  </data>
+  <data name="Shift" xml:space="preserve">
+    <value>Shift</value>
+  </data>
+  <data name="Win" xml:space="preserve">
+    <value>Win</value>
+  </data>
+  <data name="PressKey" xml:space="preserve">
+    <value>キーを押してください</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>保存</value>
+  </data>
 </root>

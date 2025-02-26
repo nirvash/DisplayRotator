@@ -48,4 +48,55 @@
   <data name="Exit" xml:space="preserve">
     <value>Exit</value>
   </data>
+  <data name="Display" xml:space="preserve">
+    <value>Display</value>
+  </data>
+  <data name="RotationDirection" xml:space="preserve">
+    <value>Rotation Direction</value>
+  </data>
+  <data name="Shortcut" xml:space="preserve">
+    <value>Shortcut</value>
+  </data>
+  <data name="Operation" xml:space="preserve">
+    <value>Operation</value>
+  </data>
+  <data name="Set" xml:space="preserve">
+    <value>Set</value>
+  </data>
+  <data name="Clear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="NotSet" xml:space="preserve">
+    <value>Not Set</value>
+  </data>
+  <data name="HotKeyRegistrationFailed" xml:space="preserve">
+    <value>Hotkey registration failed</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="DisplayNotFound" xml:space="preserve">
+    <value>Display not found</value>
+  </data>
+  <data name="Ctrl" xml:space="preserve">
+    <value>Ctrl</value>
+  </data>
+  <data name="Alt" xml:space="preserve">
+    <value>Alt</value>
+  </data>
+  <data name="Shift" xml:space="preserve">
+    <value>Shift</value>
+  </data>
+  <data name="Win" xml:space="preserve">
+    <value>Win</value>
+  </data>
+  <data name="PressKey" xml:space="preserve">
+    <value>Press a key</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
 </root>
