@@ -20,6 +20,9 @@ namespace DisplayRotator
         [DllImport("user32.dll")]
         private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 
+        [DllImport("User32.dll", ExactSpelling = true, CharSet = CharSet.Auto)]
+        public static extern bool SetForegroundWindow(HandleRef hWnd);
+
         // ホットキー関連の定数
         private const int MOD_ALT = 0x0001;
         private const int MOD_CONTROL = 0x0002;
@@ -75,6 +78,7 @@ namespace DisplayRotator
                 y = Math.Max(workingArea.Top, Math.Min(workingArea.Bottom - contextMenu.Height, y));
 
                 // メニューを表示
+                SetForegroundWindow(new HandleRef(this, this.Handle));
                 contextMenu.Show(new Point(x, y));
             };
 
@@ -86,6 +90,8 @@ namespace DisplayRotator
         private void ShowShortcutSettings()
         {
             using var form = new ShortcutSettingsForm(_settingsManager);
+            form.Icon = new Icon(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "display.ico"));  // アイコンを設定
+            form.ShowInTaskbar = true;  // タスクバーに表示
             if (form.ShowDialog() == DialogResult.OK)
             {
                 // メニュー項目の表示を更新
