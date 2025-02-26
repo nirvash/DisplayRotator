@@ -4,6 +4,8 @@
 
 DisplayRotator は、ディスプレイの回転を簡単に管理するためのツールです。ショートカットキーを設定して、ディスプレイの回転を素早く切り替えることができます。
 
+<img src="assets/screenshot.png" alt="スクリーンショット" width="400"/>
+
 ## 特徴
 
 - ディスプレイの回転を簡単に管理
@@ -12,6 +14,14 @@ DisplayRotator は、ディスプレイの回転を簡単に管理するため�
 - 通知アイコンからの簡単な操作
 
 ## インストール
+
+### 方法 1: バイナリのダウンロード
+
+1. [リリースページ](https://github.com/nirvash/DisplayRotator/releases)から最新のバイナリをダウンロードします。
+2. ダウンロードした zip ファイルを解凍します。
+3. `DisplayRotator.exe`を実行します。
+
+### 方法 2: ソースからビルド
 
 1. リポジトリをクローンします。
 
@@ -78,16 +88,24 @@ DisplayRotator は、ディスプレイの回転を簡単に管理するため�
 
 ```
 DisplayRotator/
+├── .github/                 # GitHub関連の設定
+│   └── workflows/          # GitHub Actionsワークフロー
+│       └── release.yml     # リリースビルド設定
+├── assets/                 # リソースファイル
+│   └── display.ico        # アプリケーションアイコン
 ├── src/                    # ソースコード
-│   └── DisplayRotator/     # メインプロジェクト
-│       ├── Program.cs
-│       ├── MainForm.cs
-│       └── DisplayRotator.csproj
-├── assets/                 # アイコンなどの資産
-│   └── icons/
-├── .gitignore              # Gitの除外設定
-├── README.md               # プロジェクトの説明
-└── LICENSE                 # ライセンス情報
+│   ├── DisplayRotator.csproj
+│   ├── MainForm.cs        # メインフォーム
+│   ├── Program.cs         # エントリーポイント
+│   ├── RotationConstants.cs
+│   ├── SettingsManager.cs
+│   ├── ShortcutForm.cs
+│   └── ShortcutSettingsForm.cs
+├── .gitignore
+├── DisplayRotator.sln      # ソリューションファイル
+├── LICENSE                 # MITライセンス
+├── README.md              # 日本語ドキュメント
+└── README_EN.md           # 英語ドキュメント
 ```
 
 ## ライセンス

@@ -4,6 +4,8 @@
 
 DisplayRotator is a tool for easily managing display rotation. You can set shortcut keys to quickly switch display rotation.
 
+![Screenshot](assets/screenshot.png)
+
 ## Features
 
 - Easily manage display rotation
@@ -12,6 +14,14 @@ DisplayRotator is a tool for easily managing display rotation. You can set short
 - Easy operation from the notification icon
 
 ## Installation
+
+### Option 1: Download Binary
+
+1. Download the latest binary from the [releases page](https://github.com/nirvash/DisplayRotator/releases).
+2. Extract the downloaded zip file.
+3. Run `DisplayRotator.exe`.
+
+### Option 2: Build from Source
 
 1. Clone the repository.
 
@@ -78,16 +88,24 @@ DisplayRotator is a tool for easily managing display rotation. You can set short
 
 ```
 DisplayRotator/
+├── .github/                 # GitHub related settings
+│   └── workflows/          # GitHub Actions workflows
+│       └── release.yml     # Release build configuration
+├── assets/                 # Resource files
+│   └── display.ico        # Application icon
 ├── src/                    # Source code
-│   └── DisplayRotator/     # Main project
-│       ├── Program.cs
-│       ├── MainForm.cs
-│       └── DisplayRotator.csproj
-├── assets/                 # Assets like icons
-│   └── icons/
-├── .gitignore              # Git ignore settings
-├── README.md               # Project description
-└── LICENSE                 # License information
+│   ├── DisplayRotator.csproj
+│   ├── MainForm.cs        # Main form
+│   ├── Program.cs         # Entry point
+│   ├── RotationConstants.cs
+│   ├── SettingsManager.cs
+│   ├── ShortcutForm.cs
+│   └── ShortcutSettingsForm.cs
+├── .gitignore
+├── DisplayRotator.sln      # Solution file
+├── LICENSE                 # MIT License
+├── README.md              # Japanese documentation
+└── README_EN.md           # English documentation
 ```
 
 ## License
