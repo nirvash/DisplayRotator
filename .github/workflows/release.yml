@@ -6,6 +6,9 @@ on:
     tags:
       - "v*"
 
+permissions:
+  contents: write # Grant permissions for release creation
+
 jobs:
   release:
     runs-on: windows-latest
@@ -42,6 +45,9 @@ jobs:
           type: "zip"
           filename: "DisplayRotator-${{ github.ref_name }}.zip"
           directory: "publish"
+
+      - name: List files for debugging
+        run: ls -R
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
