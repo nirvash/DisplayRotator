@@ -1,0 +1,19 @@
+# .NET Core
+src/bin/
+src/obj/
+*.user
+*.userosscache
+*.suo
+*.userprefs
+
+# Visual Studio files
+.vs/
+*.ncrunch*
+*.[Cc]ache
+
+# Visual Studio Code
+.vscode/
+
+# Windows
+Thumbs.db
+Desktop.ini
