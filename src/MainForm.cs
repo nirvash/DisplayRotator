@@ -7,23 +7,7 @@ namespace DisplayRotator
 {
     public class MainForm : Form
     {
-        // Windows APIのインポート
-        [DllImport("user32.dll")]
-        public static extern bool EnumDisplaySettings(string? deviceName, int modeNum, ref DEVMODE devMode);
-
-        [DllImport("user32.dll")]
-        public static extern int ChangeDisplaySettings(ref DEVMODE devMode, int flags);
-
-        [DllImport("user32.dll")]
-        private static extern bool RegisterHotKey(IntPtr hWnd, int id, int fsModifiers, int vk);
-
-        [DllImport("user32.dll")]
-        private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
-
-        [DllImport("User32.dll", ExactSpelling = true, CharSet = CharSet.Auto)]
-        public static extern bool SetForegroundWindow(HandleRef hWnd);
-
-        // ホットキー関連の定数
+        // ホットキー関連の修飾キー（このアプリ内でのみ使用）
         private const int MOD_ALT = 0x0001;
         private const int MOD_CONTROL = 0x0002;
         private const int MOD_SHIFT = 0x0004;
@@ -127,6 +111,18 @@ namespace DisplayRotator
                 }
             }
 
+            if (_settingsManager.IsEnabled(RotationConstants.SWITCH_PRIMARY_DISPLAY))
+            {
+                contextMenu?.Items.Add("-");
+                var menuItem = new ToolStripMenuItem(resourceManager.GetString("SwitchPrimaryDisplay", CultureInfo.CurrentCulture));
+                menuItem.Click += (s, e) => SwitchPrimaryDisplay();
+                var shortcut = _settingsManager.GetShortcut(RotationConstants.SWITCH_PRIMARY_DISPLAY);
+                menuItem.Text = shortcut.HasValue
+                    ? $"{menuItem.Text} ({shortcut})"
+                    : menuItem.Text;
+                contextMenu?.Items.Add(menuItem);
+            }
+
             contextMenu?.Items.Add("-");
             contextMenu?.Items.Add(resourceManager.GetString("ShortcutSettings", CultureInfo.CurrentCulture), null, (s, e) => ShowShortcutSettings());
             contextMenu?.Items.Add("-");
@@ -139,7 +135,8 @@ namespace DisplayRotator
                 RotationConstants.DMDO_DEFAULT,
                 RotationConstants.DMDO_90,
                 RotationConstants.DMDO_180,
-                RotationConstants.DMDO_270
+                RotationConstants.DMDO_270,
+                RotationConstants.SWITCH_PRIMARY_DISPLAY
             };
 
             for (int i = 0; i < rotations.Length; i++)
@@ -165,7 +162,7 @@ namespace DisplayRotator
 
         private void UnregisterHotKeys()
         {
-            for (int i = 0; i <= 3; i++)
+            for (int i = 0; i <= 4; i++)
             {
                 UnregisterHotKey(this.Handle, i);
             }
@@ -186,9 +183,16 @@ namespace DisplayRotator
             if (m.Msg == WM_HOTKEY)
             {
                 int id = m.WParam.ToInt32();
-                if (id >= 0 && id < 4) // 修正: id の範囲を確認
+                // Use the number of rotation hotkeys for the range check
+                int rotationHotkeyCount = 4; // DMDO_DEFAULT, DMDO_90, DMDO_180, DMDO_270
+                if (id >= 0 && id < rotationHotkeyCount)
                 {
                     RotateScreen(id);
+                    return;
+                }
+                else if (id == RotationConstants.SWITCH_PRIMARY_DISPLAY)
+                {
+                    SwitchPrimaryDisplay();
                     return;
                 }
             }
@@ -197,36 +201,124 @@ namespace DisplayRotator
 
         private void RotateScreen(int orientation)
         {
-            DEVMODE dm = new DEVMODE();
+            var dm = new DEVMODE();
             dm.dmSize = (short)Marshal.SizeOf(typeof(DEVMODE));
 
-            // 現在のディスプレイ設定を取得
-            EnumDisplaySettings(null, ENUM_CURRENT_SETTINGS, ref dm);
+            // 現在のディスプレイ設定（アクティブ ディスプレイ）を取得
+            Logger.Info($"[Rotate] START orientation={orientation}");
+            if (!EnumDisplaySettings(null, ENUM_CURRENT_SETTINGS, ref dm))
+            {
+                Logger.Error("[Rotate] EnumDisplaySettings failed (null device)");
+                MessageBox.Show("Failed to get current display settings", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
-            // 現在の向きを記録
             int currentOrientation = dm.dmDisplayOrientation;
+            Logger.Info($"[Rotate] Current orient={currentOrientation} width={dm.dmPelsWidth} height={dm.dmPelsHeight} bpp={dm.dmBitsPerPel} freq={dm.dmDisplayFrequency}");
 
             // 新しい向きを設定
             dm.dmDisplayOrientation = orientation;
 
-            // 90度/270度回転の場合は幅と高さを入れ替え
-            if ((orientation == RotationConstants.DMDO_90 || orientation == RotationConstants.DMDO_270) &&
-                (currentOrientation == RotationConstants.DMDO_DEFAULT || currentOrientation == RotationConstants.DMDO_180))
+            // 回転に応じて幅・高さを必要なら入れ替える
+            bool needSwap =
+                (orientation == RotationConstants.DMDO_90 || orientation == RotationConstants.DMDO_270) !=
+                (currentOrientation == RotationConstants.DMDO_90 || currentOrientation == RotationConstants.DMDO_270);
+
+            if (needSwap)
             {
-                int temp = dm.dmPelsHeight;
-                dm.dmPelsHeight = dm.dmPelsWidth;
-                dm.dmPelsWidth = temp;
-            }
-            else if ((orientation == RotationConstants.DMDO_DEFAULT || orientation == RotationConstants.DMDO_180) &&
-                     (currentOrientation == RotationConstants.DMDO_90 || currentOrientation == RotationConstants.DMDO_270))
-            {
-                int temp = dm.dmPelsHeight;
-                dm.dmPelsHeight = dm.dmPelsWidth;
-                dm.dmPelsWidth = temp;
+                int tmp = dm.dmPelsWidth;
+                dm.dmPelsWidth = dm.dmPelsHeight;
+                dm.dmPelsHeight = tmp;
+                Logger.Info("[Rotate] Swapped width/height for 90/270 transition");
             }
 
-            // 変更を適用
-            ChangeDisplaySettings(ref dm, CDS_UPDATEREGISTRY);
+            // 変更対象フィールドを明示
+            dm.dmFields |= DM_DISPLAYORIENTATION | DM_PELSWIDTH | DM_PELSHEIGHT;
+            Logger.Info($"[Rotate] Apply newOrient={dm.dmDisplayOrientation} width={dm.dmPelsWidth} height={dm.dmPelsHeight} fields=0x{dm.dmFields:X}");
+
+            // 1) レジストリ更新を伴う適用（デバイス指定なし＝現在のディスプレイ）
+            int result = ChangeDisplaySettingsEx(null, ref dm, IntPtr.Zero, CDS_UPDATEREGISTRY, IntPtr.Zero);
+            if (result != DISP_CHANGE_SUCCESSFUL)
+            {
+                Logger.Error($"[Rotate] Stage1 failed result={result} win32err={Marshal.GetLastWin32Error()}");
+                MessageBox.Show($"Failed to change display settings (Ex). Result: {result}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // 2) 最終確認の呼び出し（NULL DEVMODE）で OS に確定させる
+            result = ChangeDisplaySettingsEx(null, IntPtr.Zero, IntPtr.Zero, 0, IntPtr.Zero);
+            if (result != DISP_CHANGE_SUCCESSFUL)
+            {
+                Logger.Error($"[Rotate] Confirm failed result={result} win32err={Marshal.GetLastWin32Error()}");
+                MessageBox.Show($"Display settings confirmation failed. Result: {result}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
+            {
+                Logger.Info("[Rotate] SUCCESS");
+            }
+        }
+
+        private void SwitchPrimaryDisplay() {
+            if (Screen.AllScreens.Length < 2) return;
+            Logger.Info("[SwitchPrimary] START");
+
+            // 列挙
+            var devices = new List<(DISPLAY_DEVICE dev, DEVMODE mode, bool isPrimary)>();
+            for (uint i = 0; ; i++) {
+                var dd = new DISPLAY_DEVICE { cb = Marshal.SizeOf<DISPLAY_DEVICE>() };
+                if (!EnumDisplayDevices(null, i, ref dd, 0)) break;
+                if ((dd.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP) == 0) continue;
+                var dm = new DEVMODE { dmSize = (short)Marshal.SizeOf<DEVMODE>() };
+                if (!EnumDisplaySettings(dd.DeviceName, ENUM_CURRENT_SETTINGS, ref dm)) continue;
+                bool primary = (dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE) != 0;
+                devices.Add((dd, dm, primary));
+                Logger.Info($"[SwitchPrimary] Enum name={dd.DeviceName} primary={primary} pos=({dm.dmPositionX},{dm.dmPositionY}) size={dm.dmPelsWidth}x{dm.dmPelsHeight}");
+            }
+            if (devices.Count < 2) { Logger.Info("[SwitchPrimary] Only one display"); return; }
+
+            var current = devices.FirstOrDefault(d => d.isPrimary);
+            var next = devices.FirstOrDefault(d => !d.isPrimary);
+            if (next.dev.DeviceName == null || current.dev.DeviceName == null) { Logger.Error("[SwitchPrimary] Device name missing"); return; }
+            Logger.Info($"[SwitchPrimary] currentPrimary={current.dev.DeviceName} nextPrimary={next.dev.DeviceName}");
+
+            int offsetX = next.mode.dmPositionX;
+            int offsetY = next.mode.dmPositionY;
+
+            // 新プライマリを (0,0) へ移動しつつ一度でプライマリ化（フォールバックなし）
+            var primaryDm = next.mode; primaryDm.dmSize = (short)Marshal.SizeOf<DEVMODE>();
+            primaryDm.dmPositionX = primaryDm.dmPositionX - offsetX;
+            primaryDm.dmPositionY = primaryDm.dmPositionY - offsetY;
+            primaryDm.dmFields = DM_POSITION;
+            Logger.Info($"[SwitchPrimary] SetPrimary+Move device={next.dev.DeviceName} pos=({primaryDm.dmPositionX},{primaryDm.dmPositionY}) size={primaryDm.dmPelsWidth}x{primaryDm.dmPelsHeight}");
+            int rPrimary = ChangeDisplaySettingsEx(next.dev.DeviceName, ref primaryDm, IntPtr.Zero, CDS_UPDATEREGISTRY | CDS_NORESET | CDS_SET_PRIMARY, IntPtr.Zero);
+            if (rPrimary != DISP_CHANGE_SUCCESSFUL) {
+                Logger.Error($"[SwitchPrimary] SetPrimary+Move failed result={rPrimary} err={Marshal.GetLastWin32Error()}");
+                MessageBox.Show($"Failed to set primary {next.dev.DeviceName} result={rPrimary}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // 他ディスプレイ再配置
+            foreach (var entry in devices.Where(d => d.dev.DeviceName != next.dev.DeviceName)) {
+                var dm = entry.mode; dm.dmSize = (short)Marshal.SizeOf<DEVMODE>();
+                dm.dmPositionX = dm.dmPositionX - offsetX;
+                dm.dmPositionY = dm.dmPositionY - offsetY;
+                dm.dmFields = DM_POSITION;
+                Logger.Info($"[SwitchPrimary] Reposition {entry.dev.DeviceName} pos=({dm.dmPositionX},{dm.dmPositionY}) size={dm.dmPelsWidth}x{dm.dmPelsHeight}");
+                int r = ChangeDisplaySettingsEx(entry.dev.DeviceName, ref dm, IntPtr.Zero, CDS_UPDATEREGISTRY | CDS_NORESET, IntPtr.Zero);
+                if (r != DISP_CHANGE_SUCCESSFUL) {
+                    Logger.Error($"[SwitchPrimary] Reposition failed {entry.dev.DeviceName} r={r} err={Marshal.GetLastWin32Error()}");
+                    MessageBox.Show($"Failed to reposition {entry.dev.DeviceName} r={r}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+            }
+
+            int confirm = ChangeDisplaySettingsEx(null, IntPtr.Zero, IntPtr.Zero, 0, IntPtr.Zero);
+            if (confirm != DISP_CHANGE_SUCCESSFUL) {
+                Logger.Error($"[SwitchPrimary] Confirm failed r={confirm} err={Marshal.GetLastWin32Error()}");
+                MessageBox.Show($"Display config confirmation failed r={confirm}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            } else {
+                Logger.Info("[SwitchPrimary] SUCCESS");
+            }
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)

@@ -6,5 +6,6 @@ namespace DisplayRotator
         public const int DMDO_90 = 1;
         public const int DMDO_180 = 2;
         public const int DMDO_270 = 3;
+        public const int SWITCH_PRIMARY_DISPLAY = 4;
     }
 }
