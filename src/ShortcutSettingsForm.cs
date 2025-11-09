@@ -46,15 +46,15 @@ namespace DisplayRotator
         private void InitializeComponents()
         {
             Text = resourceManager.GetString("ShortcutSettings", CultureInfo.CurrentCulture);
-            MinimumSize = new System.Drawing.Size(400, 250);
-            Size = MinimumSize;
+            AutoSize = true;
+            AutoSizeMode = AutoSizeMode.GrowAndShrink;
             FormBorderStyle = FormBorderStyle.Sizable;  // リサイズ可能に変更
             MaximizeBox = false;
             StartPosition = FormStartPosition.CenterScreen;
 
             _layout.Dock = DockStyle.Fill;
             _layout.ColumnCount = 4;
-            _layout.RowCount = 5;
+            _layout.RowCount = 6; // 項目追加のため6行に
             // カラム幅の配分を変更（回転方向を短く、ショートカットを長く）
             _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 50F));   // 表示: 固定幅
             _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 100F));  // 回転方向: 固定幅
@@ -64,7 +64,7 @@ namespace DisplayRotator
             _layout.AutoSize = true;
 
             // 固定行の高さを設定
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 6; i++)
             {
                 _layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 35F));
             }
@@ -80,7 +80,8 @@ namespace DisplayRotator
                 (name: resourceManager.GetString("DefaultRotation", CultureInfo.CurrentCulture), id: RotationConstants.DMDO_DEFAULT),
                 (name: resourceManager.GetString("Rotate90", CultureInfo.CurrentCulture), id: RotationConstants.DMDO_90),
                 (name: resourceManager.GetString("Rotate180", CultureInfo.CurrentCulture), id: RotationConstants.DMDO_180),
-                (name: resourceManager.GetString("Rotate270", CultureInfo.CurrentCulture), id: RotationConstants.DMDO_270)
+                (name: resourceManager.GetString("Rotate270", CultureInfo.CurrentCulture), id: RotationConstants.DMDO_270),
+                (name: resourceManager.GetString("SwitchPrimaryDisplay", CultureInfo.CurrentCulture), id: RotationConstants.SWITCH_PRIMARY_DISPLAY)
             };
 
             for (int i = 0; i < rotations.Length; i++)

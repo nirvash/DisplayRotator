@@ -69,7 +69,8 @@ namespace DisplayRotator
                 RotationConstants.DMDO_DEFAULT,
                 RotationConstants.DMDO_90,
                 RotationConstants.DMDO_180,
-                RotationConstants.DMDO_270
+                RotationConstants.DMDO_270,
+                RotationConstants.SWITCH_PRIMARY_DISPLAY
             };
 
             foreach (var rotation in rotations)

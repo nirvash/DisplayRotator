@@ -99,4 +99,7 @@
   <data name="Save" xml:space="preserve">
     <value>Save</value>
   </data>
+  <data name="SwitchPrimaryDisplay" xml:space="preserve">
+    <value>Switch Primary Display</value>
+  </data>
 </root>
